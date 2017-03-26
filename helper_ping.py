@@ -11,13 +11,14 @@ class Ping(object):
         self.port = kwargs['port']
 
         self.headers = {'content-type': 'application/json'}
-
+        
         self.status = False
+        self.base_path = 'connect/'
 
     def get_ping(self, ip, timeout=15):
         """发送短信"""
-        url = 'http://{0}:{1}/connect/ping/{2}'.format(
-            self.host, self.port, ip)
+        url = 'http://{0}:{1}/{2}ping/{3}'.format(
+            self.host, self.port, self.base_path, ip)
         try:
             r = requests.get(url, timeout=timeout)
             if r.status_code == 200:
