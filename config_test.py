@@ -1,5 +1,4 @@
 #-*- encoding: utf-8 -*-
-from ini_conf import MyIni
 from my_yaml import MyYAML
 
 
