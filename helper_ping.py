@@ -9,11 +9,11 @@ class Ping(object):
     def __init__(self, **kwargs):
         self.host = kwargs['host']
         self.port = kwargs['port']
-
+        self.base_path = kwargs['path']
+        
         self.headers = {'content-type': 'application/json'}
         
         self.status = False
-        self.base_path = 'connect/'
 
     def get_ping(self, ip, timeout=15):
         """发送短信"""
