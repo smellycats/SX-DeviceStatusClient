@@ -1,0 +1,1 @@
+docker run -it -d --restart=always --name device_status_client --privileged=true -v /home/core/GitHub/watchDog/SX-DeviStatusClient:/home centos-py-base:v1.1 python /home/run.py
