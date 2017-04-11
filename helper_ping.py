@@ -1,33 +1,39 @@
 # -*- coding: utf-8 -*-
-import json
+import socket
+import os
+import platform
 
-import requests
-from requests.auth import HTTPBasicAuth
+
+def get_os():
+    '''
+    get os 类型
+    '''
+    os = platform.system()
+    if os == "Windows":
+        return "n"
+    else:
+        return "c"
 
 
-class Ping(object):
-    def __init__(self, **kwargs):
-        self.host = kwargs['host']
-        self.port = kwargs['port']
-        self.base_path = kwargs['path']
-        
-        self.headers = {'content-type': 'application/json'}
-        
-        self.status = False
+def ping(ip_str):
+    cmd = ["ping", "-{op}".format(op=get_os()),
+           "1", ip_str]
+    output = os.popen(" ".join(cmd)).readlines()
 
-    def get_ping(self, ip, timeout=15):
-        """发送短信"""
-        url = 'http://{0}:{1}/{2}ping/{3}'.format(
-            self.host, self.port, self.base_path, ip)
-        try:
-            r = requests.get(url, timeout=timeout)
-            if r.status_code == 200:
-                return json.loads(r.text)
-            else:
-                self.status = False
-                raise Exception(u'url: {url}, status: {code}, {text}'.format(
-                    url=url, code=r.status_code, text=r.text))
-        except Exception as e:
-            self.status = False
-            raise
+    flag = False
+    for line in list(output):
+        if not line:
+            continue
+        if str(line).upper().find("TTL") >= 0:
+            flag = True
+            break
+    return flag
 
+
+def check_server(address, port):
+    client = socket.socket()
+    try:
+        client.connect((address,port))
+        return True
+    except socket.error,e:
+        return False
