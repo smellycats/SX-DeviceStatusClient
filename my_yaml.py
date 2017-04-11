@@ -7,14 +7,15 @@ import ruamel.yaml
 class MyYAML(object):
     def __init__(self, path = 'my.yaml'):
         self.path = path
-        self.f = open(path, 'r')
 
     def __del__(self):
-        self.f.close()
+        pass
 
     def get_ini(self):
-        return ruamel.yaml.load(stream=self.f,
-                                Loader=ruamel.yaml.RoundTripLoader)
+        f = open(self.path, 'r')
+        return ruamel.yaml.load(
+            stream=f, Loader=ruamel.yaml.RoundTripLoader)
+        f.close()
 
     def set_ini(self, data):
         f = open(self.path, 'w')
