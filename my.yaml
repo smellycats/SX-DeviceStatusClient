@@ -1,9 +1,6 @@
-ping:
+device:
   host: 127.0.0.1
   port: 5000
   path: ''
-device:
-  host: 127.0.0.1
-  port: 5001
-  path: ''
 loop: 8
+pool: 8
