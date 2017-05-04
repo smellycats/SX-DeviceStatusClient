@@ -21,7 +21,7 @@ class WatchDog(object):
         self.my_ini = ini.get_ini()
         self.dev = Device(**dict(self.my_ini['device']))
         # 进程池
-        self.pool = mul.Pool(8)
+        self.pool = mul.Pool(self.my_ini['pool'])
         # 循环检测次数
         self.loop = self.my_ini['loop']
 
@@ -30,17 +30,22 @@ class WatchDog(object):
 
     def mul_ping(self, dev_list):
         """多进程ping"""
+        # 确认结果列表
         dev_true_list = []
+        # 不确认结果列表
         dev_false_list = []
         rel = self.pool.map(ping, [i['ip'] for i in dev_list])
         for i, j in zip(dev_list, rel):
             i['res'] = j
+            # 结果为真 则写入确认结果列表
             if j is True:
                 dev_true_list.append(i)
                 continue
+            # 结果为假并且最近一次记录为假 则写入确认结果列表
             if j is False and i['status'] is False:
                 dev_true_list.append(i)
                 continue
+            # 其他情况则不确认
             dev_false_list.append(i)
 
         return dev_true_list, dev_false_list
@@ -50,9 +55,11 @@ class WatchDog(object):
         if len(dev_list) > 0:
             self.dev.set_device(dev_list)
             for i in dev_list:
-                print '{0} {1} {2}'.format(
-                    str(arrow.now()), i['ip'], i['status'])
-                #logger.info('{0} {1}'.format(i['ip'], i['status']))
+                info = u'{0} {1} {2}'.format(
+                    arrow.now('PRC').format('YYYY-MM-DD HH:mm:ss ZZ'),
+                    i['ip'], i['status'])
+                print info
+                logger.info(info)
 
     def device_status_check(self, type):
         """"设备状态检测"""
@@ -64,6 +71,7 @@ class WatchDog(object):
             self.set_device_status(
                 [{'id': i['id'], 'ip': i['ip'],
                   'status': i['res']} for i in dev_true_list])
+            # 不确认结果列表为空则退出
             if len(dev_false_list) == 0:
                 break
             dev_info_list = dev_false_list
